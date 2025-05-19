@@ -5,6 +5,8 @@ from openai import OpenAI
 import os
 
 api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY not found in environment variables.")
 openai = OpenAI(api_key=api_key)
 
 def summarize_review(review):
