@@ -1,6 +1,4 @@
-flask
-transformers
-pandas
-scikit-learn
-spacy
-sqlalchemy
+fastapi
+uvicorn
+textblob
+openai
