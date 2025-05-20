@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.services.sentiment import analyze_sentiment
 from app.services.llm import summarize_review
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 # CORS middleware
 app.add_middleware(

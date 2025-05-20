@@ -1,4 +1,6 @@
 fastapi
 uvicorn
-textblob
 openai
+scikit-learn
+python-dotenv
+textblob
