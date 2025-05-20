@@ -1,3 +1,4 @@
+from transformers import pipeline
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -7,14 +8,13 @@ import os
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY not found in environment variables.")
-openai = OpenAI(api_key=api_key)
 
-def summarize_review(review):
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant that summarizes user reviews."},
-            {"role": "user", "content": f"Summarize this review in one sentence: {review}"}
-        ]
-    )
-    return response.choices[0].message.content.strip()
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+
+def summarize_review(review: str) -> str:
+    try:
+        summary = summarizer(review, max_length=60, min_length=15, do_sample=False)
+        return summary[0]['summary_text']
+    except Exception as e:
+        return "Summarization failed: " + str(e)
+

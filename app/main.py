@@ -3,12 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.services.sentiment import analyze_sentiment
 from app.services.llm import summarize_review
 
-app = FastAPI(debug=True)
+app = FastAPI()
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔒 production için bunu değiştir
+    allow_origins=["*"],  # Production için spesifik domain ekleyin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,6 +26,7 @@ async def analyze_feedback(request: Request):
         sentiment = analyze_sentiment(review)
         summary = summarize_review(review)
     except Exception as e:
+        print(f"Error in analyze_feedback: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
     return {"sentiment": sentiment, "summary": summary}
