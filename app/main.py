@@ -15,18 +15,10 @@ app.add_middleware(
 )
 
 @app.post("/analyze/")
-async def analyze_feedback(request: Request):
-    data = await request.json()
-    review = data.get("review")
+def analyze_feedback(request: FeedbackRequest):
+    print(f"Gelen veri: {request.text}")
+    summary = summarize_review(request.text)
+    sentiment = analyze_sentiment(request.text)
+    print(f"Özet: {summary}, Duygu: {sentiment}")
+    return {"summary": summary, "sentiment": sentiment}
 
-    if not review:
-        raise HTTPException(status_code=400, detail="Missing 'review' field.")
-
-    try:
-        sentiment = analyze_sentiment(review)
-        summary = summarize_review(review)
-    except Exception as e:
-        print(f"Error in analyze_feedback: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-    return {"sentiment": sentiment, "summary": summary}

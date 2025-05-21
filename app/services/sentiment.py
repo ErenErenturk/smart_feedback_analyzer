@@ -1,12 +1,8 @@
-from textblob import TextBlob
+from ai.processor import sentiment_analyzer
 
 def analyze_sentiment(text: str) -> str:
-    analysis = TextBlob(text)
-    polarity = analysis.sentiment.polarity
-
-    if polarity > 0.1:
-        return "positive"
-    elif polarity < -0.1:
-        return "negative"
-    else:
-        return "neutral"
+    try:
+        result = sentiment_analyzer(text)
+        return result[0]["label"]  # örn. LABEL_0 → negatif
+    except Exception as e:
+        return f"Duygu analizi başarısız: {str(e)}"

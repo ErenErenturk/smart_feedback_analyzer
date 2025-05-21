@@ -1,20 +1,20 @@
-from transformers import pipeline
-from dotenv import load_dotenv
-load_dotenv()
+from ai.processor import summary_tokenizer, summary_model
+import torch
 
-from openai import OpenAI
-import os
-
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY not found in environment variables.")
-
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
-
-def summarize_review(review: str) -> str:
+def summarize_review(text: str) -> str:
     try:
-        summary = summarizer(review, max_length=60, min_length=15, do_sample=False)
-        return summary[0]['summary_text']
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        summary_model.to(device)
+        
+        inputs = summary_tokenizer.encode(text, return_tensors="pt", max_length=512, truncation=True).to(device)
+        summary_ids = summarizer.generate(
+            inputs,
+            max_length=150,
+            min_length=40,
+            length_penalty=2.0,
+            num_beams=4,
+            early_stopping=True
+        )
+        return summary_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     except Exception as e:
-        return "Summarization failed: " + str(e)
-
+        return f"Özetleme hatası: {str(e)}"
