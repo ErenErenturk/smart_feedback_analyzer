@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request
 from app.services.sentiment import analyze_sentiment
 from app.services.llm import summarize_review
 
@@ -15,10 +15,23 @@ app.add_middleware(
 )
 
 @app.post("/analyze/")
-def analyze_feedback(request: FeedbackRequest):
-    print(f"Gelen veri: {request.text}")
-    summary = summarize_review(request.text)
-    sentiment = analyze_sentiment(request.text)
-    print(f"Özet: {summary}, Duygu: {sentiment}")
-    return {"summary": summary, "sentiment": sentiment}
+async def analyze_feedback(request: Request):
+    data = await request.json()
+    text = data.get("review")  # ← burada düzeltildi
 
+    print("Gelen veri:", data)
+    print("Text:", text)
+
+    if not text:
+        return {"error": "No 'review' field provided."}
+
+    summary = summarize_review(text)
+    sentiment = analyze_sentiment(text)
+
+    print("Summary:", summary)
+    print("Sentiment:", sentiment)
+
+    return {
+        "summary": summary,
+        "sentiment": sentiment
+    }
